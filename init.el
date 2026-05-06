@@ -22,7 +22,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages '(yaml-mode auctex good-scroll ess web-mode elpy company)))
+ '(package-selected-packages
+   '(markdown-mode yaml-mode auctex good-scroll ess web-mode elpy company)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -37,6 +38,7 @@
 (require 'apropospriate)
 ;; Load the apropospriate theme (you can choose dark, light, or the general one)
 (load-theme 'apropospriate-dark t)  ;; or 'apropospriate-dark, 'apropospriate-light
+;; (load-theme 'apropospriate-claude-dark t)
 
 
 ;  ____         _                    _              
@@ -915,6 +917,8 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
     (python-shell-send-buffer))     ;; For Python
    ((eq major-mode 'LaTeX-mode)
     (TeX-command-run-all arg))      ;; For LaTeX documents
+   ((eq major-mode 'markdown-mode)
+    (my/markdown-preview-eww))
    (t
     (message "No compile-all action defined for %s" major-mode))))
 
@@ -1216,6 +1220,15 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 	python-indent-guess-indent-offset-verbose nil
 	python-indent-offset 4))
 
+;; (use-package python
+;;   :ensure t
+;;   :config
+;;   (setq python-shell-interpreter "python3"
+;;         python-shell-interpreter-args "-i"
+;;         python-shell-completion-native-enable nil
+;;         python-indent-guess-indent-offset-verbose nil
+;;         python-indent-offset 4))
+
 
 ;; (use-package pyvenv
 ;;   :ensure t
@@ -1352,3 +1365,17 @@ Installs IPython and any packages listed in requirements.txt if present."
                         (setq tab-width 2)
                         (setq yaml-indent-offset 2)
                         (setq indent-tabs-mode nil)))))
+
+;; MARKDOWN ___________________________________________________________
+(use-package markdown-mode
+  :ensure t
+  :mode ("\\.md\\'" . markdown-mode)
+  :config
+  (setq markdown-header-scaling t)
+  (setq markdown-header-scaling-values '(2.0 1.7 1.4 1.1 1.0 1.0))
+  (setq markdown-hide-markup t)
+  (setq markdown-fontify-code-blocks-natively t)
+  :hook
+  (markdown-mode . (lambda ()
+                     (setq-local markdown-header-scaling t)
+                     (markdown-update-header-faces t))))
