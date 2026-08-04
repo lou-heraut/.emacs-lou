@@ -1,0 +1,274 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Raleway:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── Couleurs INRAE ───────────────────────────────────────────── */
+
+:root {
+    --cyan:         #00A3A6;
+    --cyan-light:   #66C1BF;
+    --cyan-lighter: #C2E6E5;
+    --dark-cyan:    #275662;
+    --green:        #9DC544;
+    --blue:         #42307B;
+    --text:         #231F20;
+    --grey:         #797870;
+    --light-grey:   #F6F6F6;
+}
+
+/* ── Page ─────────────────────────────────────────────────────── */
+
+@page {
+    margin: 3cm 3cm 3cm 3cm;
+    size: A4;
+
+    @top-center {
+        content: element(header);
+    }
+
+    @bottom-right {
+        content: "p. " counter(page);
+        font-family: 'Source Sans 3', sans-serif;
+        font-size: 12px;
+        color: var(--cyan);
+        font-weight: 600;
+    }
+}
+
+@page:first {
+    @top-center { content: none; }
+}
+
+body {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--text);
+    background: #ffffff;
+    font-weight: 400;
+}
+
+/* ── Header courant ───────────────────────────────────────────── */
+
+.page-header {
+    position: running(header);
+    width: 100%;
+    border-bottom: 1px solid var(--cyan-lighter);
+    padding-bottom: 5px;
+}
+
+.header-title-block {
+    display: flex;
+    align-items: center;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 11px;
+    color: var(--grey);
+}
+
+.header-title {
+    font-weight: 600;
+    color: var(--cyan);
+}
+
+.header-sep {
+    color: var(--cyan-lighter);
+    margin: 0 0.3em;
+}
+
+.header-author { color: var(--grey); }
+.header-date   { color: var(--grey); }
+
+/* ── Footer AE ────────────────────────────────────────────────── */
+
+.page-footer-ae {
+    position: fixed;
+    bottom: 0.5cm;
+    left: 0;
+    width: 6cm;
+}
+
+.logo-ae {
+    height: 2.2cm;
+    opacity: 0.15;
+}
+
+/* ── Bloc titre page 1 ────────────────────────────────────────── */
+
+.title-block {
+    margin-bottom: 2.5em;
+}
+
+.doc-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: 2.4em;
+    font-weight: 900;
+    color: var(--dark-cyan);
+    margin: 0 0 0.15em 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    border: none;
+    padding: 0;
+}
+
+.doc-subtitle {
+    font-family: 'Raleway', sans-serif;
+    font-size: 1.2em;
+    font-weight: 400;
+    color: var(--cyan-light);
+    margin: 0 0 0.4em 0;
+    font-style: italic;
+}
+
+.doc-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+    font-size: 0.88em;
+    margin-top: 0.5em;
+}
+
+.doc-author      { font-weight: 600; color: var(--cyan); }
+.doc-affiliation { color: var(--cyan-light); }
+.doc-date        { color: var(--grey); }
+
+/* ── Titres ───────────────────────────────────────────────────── */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Raleway', sans-serif;
+    color: var(--cyan-light);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 1.4em;
+    margin-bottom: 0.3em;
+    border: none;
+    padding: 0;
+}
+
+h1 { font-size: 1.8em; font-weight: 900; }
+h2 { font-size: 1.4em; }
+h3 { font-size: 1.15em; }
+h4 { font-size: 1em; color: var(--grey); font-weight: 600; }
+
+/* ── Paragraphes ──────────────────────────────────────────────── */
+
+p {
+    margin: 0 0 0.8em 0;
+    orphans: 3;
+    widows: 3;
+    text-align: justify;
+    hyphens: auto;
+}
+
+/* ── Code inline ──────────────────────────────────────────────── */
+
+code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: var(--light-grey);
+    border-radius: 3px;
+    padding: 0.15em 0.4em;
+    color: var(--dark-cyan);
+    font-weight: 500;
+}
+
+/* ── Blocs de code ────────────────────────────────────────────── */
+
+pre {
+    background: var(--light-grey);
+    border-left: 3px solid var(--cyan);
+    border-radius: 0 4px 4px 0;
+    padding: 0.9em 1.1em;
+    margin: 1em 0;
+    line-height: 1.6;
+}
+
+pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 0.85em;
+}
+
+/* ── Citations ────────────────────────────────────────────────── */
+
+blockquote {
+    border-left: 3px solid var(--cyan-lighter);
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 1.5em;
+    color: var(--grey);
+    font-style: italic;
+}
+
+blockquote p { margin: 0; }
+
+/* ── Tableaux ─────────────────────────────────────────────────── */
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 0.92em;
+}
+
+thead tr { border-bottom: 2px solid var(--cyan); }
+
+th {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700;
+    text-align: left;
+    padding: 8px 12px;
+    color: var(--cyan);
+    font-size: 0.88em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--cyan-lighter);
+    color: var(--text);
+}
+
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: var(--light-grey); }
+
+/* ── Listes ───────────────────────────────────────────────────── */
+
+ul, ol {
+    padding-left: 1.5em;
+    margin: 0.3em 0 0.8em 0;
+}
+
+li { margin-bottom: 0.2em; line-height: 1.6; }
+li > ul, li > ol { margin-top: 0.2em; margin-bottom: 0.2em; }
+ul li::marker { color: var(--cyan); }
+ol li::marker { color: var(--cyan); font-weight: 600; }
+
+/* ── Liens ────────────────────────────────────────────────────── */
+
+a {
+    color: var(--cyan);
+    text-decoration: none;
+    border-bottom: 1px solid var(--cyan-lighter);
+}
+
+/* ── Séparateurs ──────────────────────────────────────────────── */
+
+hr {
+    border: none;
+    border-top: 1px solid var(--cyan-lighter);
+    margin: 1.5em 0;
+}
+
+/* ── Images ───────────────────────────────────────────────────── */
+
+img {
+    max-width: 100%;
+    border-radius: 4px;
+    display: block;
+    margin: 1em auto;
+}
+
+/* ── Strong / Em ──────────────────────────────────────────────── */
+
+strong { font-weight: 700; color: var(--dark-cyan); }
+em { font-style: italic; color: var(--grey); }

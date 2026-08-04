@@ -1,2 +1,43 @@
-*~ 
-*#
+# Sauvegardes et fichiers temporaires d'Emacs
+*~
+\#*\#
+.\#*
+*.elc
+*.eln
+
+# Paquets et caches : regeneres automatiquement, ne doivent pas etre versionnes.
+# `M-x package-install-selected-packages' les reinstalle a partir de la liste
+# `package-selected-packages' declaree en haut de init.el.
+/elpa/
+/eln-cache/
+/elpy/
+/auto-save-list/
+/transient/
+/url/
+/request/
+/tramp
+/network-security.data
+/projectile-bookmarks.eld
+/recentf
+/bookmarks
+/places
+/history
+
+# Fichier poubelle de M-x customize. init.el definit `custom-file' vers ce
+# fichier sans jamais le charger : toute la config reste a plat dans init.el.
+/custom.el
+
+# Sessions Emacs
+/session.*
+/.emacs.desktop
+/.emacs.desktop.lock
+
+# Secrets : ne jamais versionner. Les identifiants PostgreSQL vivent dans
+# ~/.pgpass (hors de ce depot), lu directement par libpq.
+/secrets.el
+/.authinfo
+/.authinfo.gpg
+
+# Ancienne configuration conservee localement
+/.emacs_old
+/init_save.el

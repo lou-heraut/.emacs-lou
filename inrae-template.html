@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="$lang$">
+<head>
+<meta charset="utf-8">
+<title>$title$</title>
+<link rel="stylesheet" href="$css$">
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-title-block">
+    <span class="header-title">$title$</span>
+$if(author)$
+    <span class="header-sep"> · </span>
+    <span class="header-author">$author$</span>
+$endif$
+$if(date)$
+    <span class="header-sep"> · </span>
+    <span class="header-date">$date$</span>
+$endif$
+  </div>
+</div>
+
+<div class="title-block">
+  <h1 class="doc-title">$title$</h1>
+$if(subtitle)$
+  <p class="doc-subtitle">$subtitle$</p>
+$endif$
+  <div class="doc-meta">
+$if(author)$
+    <span class="doc-author">$author$</span>
+$endif$
+$if(affiliation)$
+    <span class="doc-affiliation">$affiliation$</span>
+$endif$
+$if(date)$
+    <span class="doc-date">$date$</span>
+    $endif$
+  </div>
+</div>
+
+$body$
+
+<div class="page-footer-ae">
+    <img src="$ae-logo$" class="logo-ae" alt="">
+</div>
+
+</body>
+</html>

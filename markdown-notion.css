@@ -1,0 +1,331 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── Page ─────────────────────────────────────────────────────── */
+
+@page {
+    margin: 2cm 2.5cm;
+    size: A4;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: #1a1a1a;
+    background: #ffffff;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Titres ───────────────────────────────────────────────────── */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #0f0f0f;
+    line-height: 1.3;
+    margin-top: 1.4em;
+    margin-bottom: 0.3em;
+    letter-spacing: -0.02em;
+}
+
+h1 {
+    font-size: 2em;
+    font-weight: 700;
+    margin-top: 0;
+    padding-bottom: 0.3em;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+h2 {
+    font-size: 1.4em;
+    padding-bottom: 0.2em;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+h3 { font-size: 1.15em; }
+h4 { font-size: 1em; color: #444; }
+
+/* ── Sauts de page ────────────────────────────────────────────── */
+
+.page-break {
+    break-after: page;
+    page-break-after: always; /* fallback */
+}
+
+/* Éviter les coupures dans les blocs importants */
+pre, blockquote, table {
+    break-inside: avoid;
+}
+
+h1, h2, h3 {
+    break-after: avoid;
+}
+
+/* ── Paragraphes ──────────────────────────────────────────────── */
+
+p {
+    margin: 0 0 0.8em 0;
+    orphans: 3;
+    widows: 3;
+    text-align: justify;
+    hyphens: auto;
+}
+
+/* ── Code inline ──────────────────────────────────────────────── */
+
+code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: #f5f5f5;
+    border-radius: 4px;
+    padding: 0.15em 0.45em;
+    color: #d4294b;
+    font-weight: 500;
+}
+
+/* ── Blocs de code ────────────────────────────────────────────── */
+
+pre {
+    background: #f7f7f7;
+    border-radius: 6px;        /* plus de barre, radius partout */
+    border-left: none;         /* supprime la barre */
+    padding: 0.9em 1.1em;
+    margin: 1em 0;
+    overflow-x: auto;
+    line-height: 1.6;
+}
+
+pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #1a1a1a;
+    font-size: 0.85em;
+    font-weight: 400;
+}
+
+/* ── Citations ────────────────────────────────────────────────── */
+
+blockquote {
+    border-left: 3px solid #d4d4d4;   /* garde la barre */
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 1.5em;
+    border-radius: 0 4px 4px 0;
+    color: #555;
+    font-style: italic;
+    background: #f9f9f9;             /* ← fond manquant */
+    font-family: 'Inter', sans-serif;
+}
+
+blockquote p { margin: 0; }
+
+
+/* ── Tableaux ─────────────────────────────────────────────────── */
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 0.92em;
+}
+
+thead tr {
+    border-bottom: 2px solid #e8e8e8;
+}
+
+th {
+    font-weight: 600;
+    text-align: left;
+    padding: 8px 12px;
+    color: #444;
+    font-size: 0.88em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #1a1a1a;
+}
+
+tr:last-child td { border-bottom: none; }
+
+/* ── Listes ───────────────────────────────────────────────────── */
+
+ul, ol {
+    padding-left: 1.5em;
+    margin: 0.3em 0 0.8em 0;
+}
+
+li {
+    margin-bottom: 0.2em;
+    line-height: 1.6;
+}
+
+li > ul, li > ol {
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+}
+
+ul li::marker { color: #aaa; }
+
+p + ul,
+p + ol {
+    margin-top: -0.8em;
+}
+
+/* ── Liens ────────────────────────────────────────────────────── */
+
+a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: #ccc;
+    text-underline-offset: 2px;
+    border-bottom: none;
+}
+
+/* ── Séparateurs ──────────────────────────────────────────────── */
+
+hr {
+    border: none;
+    border-top: 1px solid #ebebeb;
+    margin: 1.5em 0;
+}
+
+/* ── Images ───────────────────────────────────────────────────── */
+
+img {
+    max-width: 100%;
+    border-radius: 6px;
+    display: block;
+    margin: 1em auto;
+}
+
+/* ── Strong / Em ──────────────────────────────────────────────── */
+
+strong { font-weight: 600; color: #0f0f0f; }
+em { font-style: italic; color: #333; }
+
+
+/* ── Header du document ───────────────────────────────────────── */
+
+.doc-header {
+    margin-bottom: 2em;
+    padding-bottom: 1em;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.doc-title {
+    font-size: 2em;
+    font-weight: 700;
+    color: #0f0f0f;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.3em 0;
+    padding: 0;
+    border: none;
+}
+
+.doc-subtitle {
+    font-size: 1.5em;
+    color: #666;
+    font-weight: 400;
+    margin: 0 0 0.6em 0;
+}
+
+.doc-affiliation {
+    font-size: 0.85em;
+    color: #aaa;
+    margin: 0.2em 0 0 0;
+    font-style: italic;
+}
+
+.doc-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: 0.88em;
+    color: #888;
+}
+
+.doc-author { font-weight: 500; color: #555; }
+.doc-date   { color: #aaa; }
+.doc-sep    { color: #ccc; }
+
+/* ── TOC ──────────────────────────────────────────────────────── */
+
+#TOC {
+    margin: 0 0 2em 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    font-size: 1em;
+    page-break-after: always;
+    break-after: page;
+}
+
+.toc-title {
+    font-size: 0.78em;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin-bottom: 0.65em;
+}
+
+#TOC ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+#TOC li { margin: 0; }
+
+#TOC a {
+    display: block;
+    padding: 0.2em 0.35em;
+    border-radius: 4px;
+    color: #555;
+    text-decoration: none;
+    line-height: 1.5;
+}
+
+#TOC > ul > li > a {
+    font-weight: 500;
+    color: #1a1a1a;
+    font-size: 0.95em;
+}
+
+#TOC ul ul {
+    padding-left: 0.9em;
+    margin: 0;
+    border-left: 2px solid #e4e4e4;
+    margin-left: 0.3em;
+}
+
+#TOC ul ul > li > a {
+    font-weight: 400;
+    color: #555;
+    font-size: 0.92em;
+}
+
+#TOC ul ul ul { padding-left: 0.8em; }
+
+#TOC ul ul ul > li > a {
+    color: #999;
+    font-size: 0.88em;
+}
+
+.back-to-toc {
+    float: right;
+    font-size: 0.75em;
+    color: #ccc;
+    text-decoration: none;
+    margin-top: 0.2em;
+}
+
+#TOC .back-to-toc {
+    visibility: hidden;
+    font-size: 0;
+}

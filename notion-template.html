@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+	<meta charset="utf-8" />
+	<title>$pagetitle$</title>
+	$for(css)$
+	<link rel="stylesheet" href="$css$">
+	$endfor$
+    </head>
+    <body>
+	$if(title)$
+	<header class="doc-header">
+	    <h1 class="doc-title">$title$</h1>
+	    $if(subtitle)$<p class="doc-subtitle">$subtitle$</p>$endif$
+	    <div class="doc-meta">
+		$if(author)$<span class="doc-author">$for(author)$$author$$sep$, $endfor$</span>$endif$
+		$if(author)$$if(date)$<span class="doc-sep">&nbsp;·&nbsp;</span>$endif$$endif$
+		$if(date)$<span class="doc-date">$date$</span>$endif$
+	    </div>
+	    $if(affiliation)$<p class="doc-affiliation">$affiliation$</p>$endif$
+	</header>
+	$endif$
+	$if(table-of-contents)$
+	<nav id="TOC">
+	    <p class="toc-title">Table des matières</p>
+	    $table-of-contents$
+	</nav>
+	$endif$
+	<main>
+	    $body$
+	</main>
+    </body>
+</html>

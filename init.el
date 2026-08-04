@@ -12,24 +12,39 @@
 (require 'use-package)
 
 
-;    _          _        
-;   /_\   _  _ | |_  ___ 
+;    _          _
+;   /_\   _  _ | |_  ___
 ;  / _ \ | || ||  _|/ _ \
 ; /_/ \_\ \_,_| \__|\___/
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(markdown-mode yaml-mode auctex good-scroll ess web-mode elpy company)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; M-x customize ecrit dans un fichier separe, qui n'est jamais charge.
+;; Toute la configuration reste donc ici, a plat et dans l'ordre voulu, et
+;; aucun bloc `custom-set-variables' ne viendra plus se greffer dans ce fichier.
+;; Contrepartie assumee : un reglage fait via M-x customize part dans custom.el
+;; et ne sera pas applique au redemarrage. Tout se regle a la main ici.
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+;; Liste explicite des paquets voulus (remplace l'ancien bloc custom-set-variables).
+;; `use-package :ensure t' n'alimente PAS cette liste, il faut donc la tenir a jour
+;; a la main quand on ajoute un paquet. Elle sert a deux choses :
+;;   - M-x package-install-selected-packages : tout reinstaller sur une nouvelle machine
+;;   - M-x package-autoremove : ne supprimer que ce qui n'est vraiment plus utilise
+(setq package-selected-packages
+      '(auctex               ; LaTeX
+        centaur-tabs         ; onglets
+        company              ; completion
+        elpy                 ; Python (config commentee plus bas, gardee au cas ou)
+        ess                  ; R
+        exec-path-from-shell ; PATH du shell en mode graphique
+        good-scroll          ; defilement fluide
+        loccur               ; filtrage de lignes dans le buffer
+        markdown-mode
+        pyvenv               ; environnements virtuels Python
+        solaire-mode         ; contraste des buffers
+        undo-fu              ; annulation lineaire
+        web-mode             ; HTML / PHP
+        xclip                ; presse-papier en mode terminal
+        yaml-mode))
 
 
 ;; Add the themes directory to the load path
@@ -62,6 +77,12 @@
 (define-key global-map (kbd "C-x C-r") 'find-name-dired)
 
 (ido-mode -1)
+
+;; auto-revert : recharge les buffers quand le fichier change sur le disque
+;; (utile quand un outil externe comme Claude Code modifie les fichiers)
+(setq global-auto-revert-non-file-buffers t) ;; rafraichit aussi dired, etc.
+(setq auto-revert-verbose nil)               ;; pas de message a chaque revert
+(global-auto-revert-mode 1)
 
 
 ;  ___                      
@@ -121,6 +142,16 @@
 (when (fboundp 'pixel-scroll-precision-mode)
   (pixel-scroll-precision-mode t))
 
+;; scroll one line at a time (less "jumpy" than defaults)
+;; Remonte depuis le bas du fichier, ou il etait noye dans un bloc duplique.
+;; Position conservee APRES good-scroll-mode pour ne rien changer a l'ordre
+;; d'evaluation d'origine.
+(setq mouse-wheel-scroll-amount '(2 ((shift) . 2))) ;; one line at a time
+(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+(setq scroll-step 1) ;; keyboard scroll one line at a time
+(setq scroll-preserve-screen-position 'always)
+
 
 
 
@@ -130,14 +161,30 @@
 ;  \___||_||_|| .__/|_.__/\___/\__,_||_|  \__,_|
 ;             |_|                               
 
-;; xclip
+;; xclip : ne s'active reellement qu'en mode terminal (emacs -nw). Ses methodes
+;; sont specialisees sur `(window-system nil)', donc en mode graphique Emacs
+;; utilise son propre code de selection X et xclip ne gene pas.
 (use-package xclip
   :ensure t
   :config
   (xclip-mode 1))
 
-;; enable clipboard in emacs
-(setq x-select-enable-clipboard t)
+;; Copier/coller sur le presse-papier systeme (et non le seul kill-ring interne).
+;; Ancien nom : x-select-enable-clipboard, obsolete depuis Emacs 25.1.
+(setq select-enable-clipboard t)
+
+;; Avant d'ecraser le presse-papier systeme avec un kill Emacs, pousser son
+;; contenu actuel dans le kill-ring. Evite de perdre ce qui avait ete copie
+;; depuis une autre application.
+(setq save-interprogram-paste-before-kill t)
+
+;; Quand Emacs se ferme en possedant le presse-papier, transmettre son contenu
+;; au gestionnaire de presse-papier du bureau. C'est deja la valeur par defaut,
+;; explicite ici parce que c'est le seul levier cote Emacs : il ne fonctionne
+;; que si un gestionnaire tourne et revendique la selection CLIPBOARD_MANAGER.
+;; Sans gestionnaire, le contenu copie est perdu a la fermeture d'Emacs, et
+;; c'est vrai de toute application X11, pas seulement d'Emacs.
+(setq x-select-enable-clipboard-manager t)
 
 (setq ns-pop-up-frames nil)
 
@@ -475,11 +522,9 @@ Do it ARG times if ARG is positive. ARG defaults to 1."
 
 
 ;; window movement
-(global-set-key (kbd "<C-x-left>")  'windmove-left)
-(global-set-key (kbd "<C-x-right>") 'windmove-right)
-(global-set-key (kbd "<C-x-up>")    'windmove-up)
-(global-set-key (kbd "<C-x-down>")  'windmove-down)
-
+;; NB : les quatre lignes "<C-x-left>" qui figuraient ici ont ete supprimees.
+;; (kbd "<C-x-left>") produit le keysym [C-x-left], qu'aucun terminal ni serveur
+;; X n'emet jamais : elles ne faisaient rien. Les bindings utiles sont ceux-ci.
 (global-set-key (kbd "C-x <left>")  'windmove-left)
 (global-set-key (kbd "C-x <right>") 'windmove-right)
 (global-set-key (kbd "C-x <up>")    'windmove-up)
@@ -506,11 +551,28 @@ Do it ARG times if ARG is positive. ARG defaults to 1."
 ; | __ || |(_-<|  _|/ _ \| '_|| |/ _|
 ; |_||_||_|/__/ \__|\___/|_|  |_|\__|
 
+;; undo-fu donne l'annulation LINEAIRE d'un editeur moderne : C-z remonte dans
+;; le passe, C-S-z redescend, et rien ne boucle. Le `undo' natif d'Emacs, lui,
+;; reparcourt sa propre pile : apres une annulation suivie de n'importe quelle
+;; autre commande, le C-z suivant se met a RETABLIR. C'est ce comportement qui
+;; donnait l'impression que l'historique "tournait en rond".
+;;
+;; ATTENTION : ces bindings-la ne suffisent pas. `cua-mode', active plus bas,
+;; place son propre keymap dans `emulation-mode-map-alists', prioritaire sur
+;; `global-map'. Il reprend C-z pour le `undo' natif. Le rattrapage se fait
+;; juste apres (cua-mode t), voir la section Killing.
 (use-package undo-fu
   :ensure t
   :bind
   (("C-z" . undo-fu-only-undo)
    ("C-S-z" . undo-fu-only-redo)))
+
+;; Historique d'annulation genereux, comme dans un editeur moderne.
+;; Valeurs Emacs par defaut : 160 ko / 240 ko / 24 Mo, vite atteintes sur un
+;; gros fichier, et l'historique est alors silencieusement tronque.
+(setq undo-limit        (* 64 1024 1024)   ; 64 Mo
+      undo-strong-limit (* 96 1024 1024)   ; 96 Mo
+      undo-outer-limit  (* 256 1024 1024)) ; 256 Mo
 
 
 ;  _  __ _  _  _  _             
@@ -521,6 +583,14 @@ Do it ARG times if ARG is positive. ARG defaults to 1."
 
 ;; CUA
 (cua-mode t)
+
+;; Rattrapage du C-z confisque par cua-mode (voir la section Historique).
+;; `cua--cua-keys-keymap' gagne sur `global-map', donc les bindings d'undo-fu
+;; declares plus haut n'atteignaient jamais le clavier : C-z retombait sur le
+;; `undo' natif, qui boucle. Ces deux lignes retablissent l'undo lineaire.
+;; Verification : C-h k puis C-z doit afficher `undo-fu-only-undo'.
+(define-key cua--cua-keys-keymap (kbd "C-z")   #'undo-fu-only-undo)
+(define-key cua--cua-keys-keymap (kbd "C-S-z") #'undo-fu-only-redo)
 
 ;; kill line
 (defun backward-kill-line (arg)
@@ -559,7 +629,8 @@ Do it ARG times if ARG is positive. ARG defaults to 1."
 (set-frame-font "hack 15" nil t)
 
 ;; line wrap
-(visual-line-mode t)
+;; (visual-line-mode t) supprime : ne s'appliquait qu'au buffer courant au
+;; demarrage (*scratch*), que la ligne suivante couvre de toute facon.
 (global-visual-line-mode t)
 ;; (global-visual-line-mode 1)
 
@@ -571,7 +642,7 @@ Do it ARG times if ARG is positive. ARG defaults to 1."
   "Major modes on which to disable line numbers."
   :group 'display-line-numbers
   :type 'list
-  :version "green")
+  :version "1.0")
 
 (defun display-line-numbers--turn-on ()
   "Turn on line numbers except for certain major modes.
@@ -653,8 +724,8 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 (xterm-mouse-mode 1)
 (setq-default cursor-type 'bar)
 
-(add-hook 'window-setup-hook '(lambda () (set-cursor-color "palegoldenrod")))
-(add-hook 'after-make-frame-functions '(lambda (f) (with-selected-frame f (set-cursor-color "palegoldenrod"))))
+(add-hook 'window-setup-hook (lambda () (set-cursor-color "palegoldenrod")))
+(add-hook 'after-make-frame-functions (lambda (f) (with-selected-frame f (set-cursor-color "palegoldenrod"))))
 
 
 ;; TAB
@@ -680,82 +751,7 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 
 ;                           --------------------
 
-;  ____         _                    _              
-; | __ )   ___ | |__    __ _ __   __(_)  ___   _ __ 
-; |  _ \  / _ \| '_ \  / _` |\ \ / /| | / _ \ | '__|
-; | |_) ||  __/| | | || (_| | \ V / | || (_) || |   
-; |____/  \___||_| |_| \__,_|  \_/  |_| \___/ |_|   
-
-;; dired
-(defun dired-open-all-files ()
-  (interactive)
-  (dired-unmark-all-marks)
-  (dired-toggle-marks)
-  (dolist (f (dired-get-marked-files)) 
-    (find-file f)))
-
-(add-hook 'dired-load-hook
-          (function (lambda () (load "dired-x") (define-key dired-mode-map (kbd "F") 'dired-open-all-files))))
-
-(define-key global-map (kbd "C-x C-d") 'dired)
-(define-key global-map (kbd "C-x C-r") 'find-name-dired)
-
-;  ___                      
-; / __| _ __  __ _  __  ___ 
-; \__ \| '_ \/ _` |/ _|/ -_)
-; |___/| .__/\__,_|\__|\___|
-;      |_|      
-
-;; new tab and ret
-;; (define-key global-map (kbd "RET") 'electric-newline-and-maybe-indent)
-(define-key global-map (kbd "RET") 'newline-and-indent)
-(define-key global-map (kbd "TAB") 'indent-for-tab-command)
-
-;  ___        _       _        
-; |   \  ___ | | ___ | |_  ___ 
-; | |) |/ -_)| |/ -_)|  _|/ -_)
-; |___/ \___||_|\___| \__|\___|
-
-;; selection delete when typing
-(delete-selection-mode)
-
-
-;  ___                _  _  _             
-; / __| __  _ _  ___ | || |(_) _ _   __ _ 
-; \__ \/ _|| '_|/ _ \| || || || ' \ / _` |
-; |___/\__||_|  \___/|_||_||_||_||_|\__, |
-;                                   |___/ 
-
-;; scroll one line at a time (less "jumpy" than defaults)
-(setq mouse-wheel-scroll-amount '(2 ((shift) . 2))) ;; one line at a time
-(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
-(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
-(setq scroll-step 1) ;; keyboard scroll one line at a time
-(setq scroll-preserve-screen-position 'always)
-
-;; scroll bar
-(set-scroll-bar-mode 'right)
-(scroll-bar-mode -1)
-
-;   ___  _  _        _                        _ 
-;  / __|| |(_) _ __ | |__  ___  __ _  _ _  __| |
-; | (__ | || || '_ \| '_ \/ _ \/ _` || '_|/ _` |
-;  \___||_||_|| .__/|_.__/\___/\__,_||_|  \__,_|
-;             |_|                               
-
-;; xclip
-(require 'xclip)
-(xclip-mode 1)
-
-;; enable clipboard in emacs
-(setq x-select-enable-clipboard t)
-
-(setq ns-pop-up-frames nil)
-
-
-;                           --------------------
-
-;  _____                _      
+;  _____                _
 ; |_   _|  ___    ___  | | ___ 
 ;   | |   / _ \  / _ \ | |/ __|
 ;   | |  | (_) || (_) || |\__ \
@@ -786,7 +782,13 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 
 ;; comment
 (define-key global-map (kbd "C-r") 'comment-line)
-(setq comment-start "#")
+
+;; Valeur de repli uniquement. Chaque mode majeur definit son propre
+;; `comment-start' localement (";" en elisp, "#" en Python et R, "%" en LaTeX),
+;; donc C-r commente toujours avec le bon symbole. Ce reglage ne sert que dans
+;; les modes qui n'en definissent aucun (text-mode, fundamental-mode), ou il
+;; evite un "No comment syntax is defined".
+(setq-default comment-start "#")
 ;; (add-hook 'r-mode-hook (lambda () (setq comment-start "#")))
 
 
@@ -918,16 +920,13 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
    ((eq major-mode 'LaTeX-mode)
     (TeX-command-run-all arg))      ;; For LaTeX documents
    ((eq major-mode 'markdown-mode)
-    (my/markdown-preview-eww))
+    (my/markdown-to-pdf))
    (t
     (message "No compile-all action defined for %s" major-mode))))
 
 
 ;; Keep your existing keybindings
-(define-key cua-global-keymap (kbd "C-S-<return>") #'compile-line-and-step)
-(define-key cua-global-keymap (kbd "C-<return>") #'compile-all)
-
-;; Bind the functions to convenient keys globally
+;; (le second exemplaire de ces deux lignes, strictement identique, a ete retire)
 (define-key cua-global-keymap (kbd "C-S-<return>") #'compile-line-and-step)
 (define-key cua-global-keymap (kbd "C-<return>") #'compile-all)
 
@@ -963,7 +962,7 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
    (lambda (x)
      (find-file x)
      (save-excursion
-       (beginning-of-buffer)
+       (goto-char (point-min))
        (setq case-fold-search nil) ; Make it case-sensitive
        (query-replace arg1 arg2)))
    (delq
@@ -976,17 +975,81 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 (define-key global-map (kbd "C-S-f") 'query-replace-in-open-buffers)
                    
 
-(defun ascii-art-convert ()
-  "Convert the current line of text to ascii art"
-  (interactive)
-  (let* ((line (buffer-substring (line-beginning-position) (line-end-position)))
-         (string-line (concat line))
-         (output-buf (generate-new-buffer "*figlet-output*"))
-         (figlet-args (list "-f" "/home/louis/.emacs.d/fonts/small.flf" "-w" "80" string-line)))
-    (apply 'call-process "figlet" nil output-buf nil figlet-args)
-    (delete-region (line-beginning-position) (line-end-position))
-    (insert-buffer-substring output-buf)
-    (indent-according-to-mode)))
+;; Bannieres ASCII.
+;;
+;; Les polices sont versionnees dans ~/.emacs.d/fonts/ et suivies par git, donc
+;; un changement de machine ne casse plus rien. C'est ce qui etait arrive :
+;; l'ancienne version pointait vers /home/louis/.emacs.d/fonts/small.flf, chemin
+;; inexistant ici, et comme elle effacait la ligne SANS verifier le code de
+;; retour de figlet, C-c a detruisait la ligne courante.
+;;
+;; Seul le binaire `figlet' est requis (paquet Debian/Ubuntu du meme nom).
+;; Les polices livrees par la distribution sont au format .tlf et ne
+;; correspondent pas aux bannieres de ce fichier, d'ou les .flf embarques ici.
+
+(defvar my/figlet-font-directory (expand-file-name "fonts" user-emacs-directory)
+  "Repertoire des polices FIGlet (.flf) livrees avec cette configuration.")
+
+(defvar my/figlet-font "small"
+  "Police FIGlet par defaut. `small' pour les sous-titres, `standard' pour les
+grands titres : ce sont les deux utilisees par les bannieres de ce fichier.")
+
+(defvar my/figlet-width 80
+  "Largeur maximale passee a figlet.")
+
+(defun my/figlet-available-fonts ()
+  "Liste les polices disponibles dans `my/figlet-font-directory'."
+  (when (file-directory-p my/figlet-font-directory)
+    (sort (mapcar #'file-name-base
+                  (directory-files my/figlet-font-directory nil "\\.flf\\'"))
+          #'string<)))
+
+(defun ascii-art-convert (&optional font)
+  "Remplace la ligne courante par sa version en ASCII art.
+
+Le resultat est commente selon le mode majeur du buffer, ce qui donne
+directement une banniere de section utilisable.
+
+Avec un prefixe (\\[universal-argument] C-c a), demande la police a utiliser
+parmi celles de `my/figlet-font-directory'. Sans prefixe, utilise
+`my/figlet-font'.
+
+Si figlet echoue, la ligne courante est laissee intacte et l'erreur est
+affichee dans le minibuffer."
+  (interactive
+   (list (if current-prefix-arg
+             (completing-read (format "Police FIGlet (defaut %s) : " my/figlet-font)
+                              (my/figlet-available-fonts) nil t nil nil my/figlet-font)
+           my/figlet-font)))
+  (let* ((font (or font my/figlet-font))
+         (text (string-trim (buffer-substring-no-properties
+                             (line-beginning-position) (line-end-position))))
+         (font-file (expand-file-name (concat font ".flf") my/figlet-font-directory)))
+    (cond
+     ((string-empty-p text)
+      (message "Ligne vide : rien a convertir."))
+     ((not (executable-find "figlet"))
+      (message "figlet introuvable. Installe-le avec : sudo apt install figlet"))
+     ((not (file-readable-p font-file))
+      (message "Police introuvable : %s (disponibles : %s)"
+               font-file
+               (string-join (or (my/figlet-available-fonts) '("aucune")) ", ")))
+     (t
+      (let* ((out    (generate-new-buffer " *figlet-output*"))
+             (status (call-process "figlet" nil (list out nil) nil
+                                   "-d" my/figlet-font-directory
+                                   "-f" font
+                                   "-w" (number-to-string my/figlet-width)
+                                   text))
+             (art    (with-current-buffer out (buffer-string))))
+        (kill-buffer out)
+        (if (not (eq status 0))
+            ;; Echec : on ne touche surtout pas au buffer.
+            (message "figlet a echoue (code %s), ligne inchangee." status)
+          (let ((start (line-beginning-position)))
+            (delete-region start (line-end-position))
+            (insert (string-trim-right art))
+            (comment-region start (point)))))))))
 
 (global-set-key (kbd "C-c a") 'ascii-art-convert)
 
@@ -1077,7 +1140,12 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 (use-package exec-path-from-shell
   :ensure t
   :config
-  (exec-path-from-shell-initialize)
+  ;; Ne lancer un shell de login que si c'est necessaire, c'est-a-dire en mode
+  ;; graphique, ou Emacs n'herite pas du PATH du terminal. En mode -nw le PATH
+  ;; est deja celui du shell parent, et ce test evite un shell inutile a chaque
+  ;; demarrage (c'est la recommandation du paquet lui-meme).
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
   (add-to-list 'exec-path "/Library/TeX/texbin"))
 
 ;; Configure AUCTeX for LaTeX
@@ -1211,14 +1279,40 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 
 
 ;; PYTHON ____________________________________________________________
+;; Choix de l'interpreteur, recalcule a chaque demarrage de shell Python.
+;;
+;; Deux environnements coexistent et n'ont pas le meme nom de binaire :
+;;   - dans un venv cree par `create-python-env', c'est "ipython"
+;;   - installe globalement par apt sur Ubuntu 24.04, c'est "ipython3"
+;; On garde volontairement un nom RELATIF et non un chemin absolu, pour que la
+;; resolution passe par `exec-path' et suive donc le venv actif du moment.
+;; Sans ipython nulle part, on retombe sur python3 avec les bons arguments,
+;; au lieu d'echouer comme avant sur un "ipython" introuvable.
+(defun my/python-interpreter ()
+  "Renvoie (NOM . ARGS) pour l'interpreteur Python a utiliser maintenant."
+  (let ((ipython (or (executable-find "ipython") (executable-find "ipython3"))))
+    (if ipython
+        (cons (file-name-nondirectory ipython) "--simple-prompt -i")
+      (cons "python3" "-i"))))
+
+(defun my/python-apply-interpreter (&optional local)
+  "Regle `python-shell-interpreter' et ses arguments selon l'environnement.
+Avec LOCAL non nil, le reglage est buffer-local (pour suivre un venv)."
+  (let ((choice (my/python-interpreter)))
+    (if local
+        (setq-local python-shell-interpreter      (car choice)
+                    python-shell-interpreter-args (cdr choice))
+      (setq-default python-shell-interpreter      (car choice)
+                    python-shell-interpreter-args (cdr choice)))))
+
 (use-package python
   :ensure t
   :config
-  (setq python-shell-interpreter "ipython"
-        python-shell-interpreter-args "--simple-prompt -i"
-        python-shell-completion-native-enable nil
+  (setq python-shell-completion-native-enable nil
 	python-indent-guess-indent-offset-verbose nil
-	python-indent-offset 4))
+	python-indent-offset 4)
+  ;; Valeur globale au demarrage ; reevaluee par buffer dans my-python-start-shell.
+  (my/python-apply-interpreter))
 
 ;; (use-package python
 ;;   :ensure t
@@ -1262,6 +1356,8 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
   "Open Python shell on the right, keep current Python buffer on the left."
   (when (and (derived-mode-p 'python-mode)
              (not (python-shell-get-process)))
+    ;; Le venv a pu etre active entre-temps par pyvenv : on rechoisit ici.
+    (my/python-apply-interpreter t)
     (let* ((source-buffer (current-buffer))
            (source-window (selected-window))
            (python-window (split-window-right)))
@@ -1324,15 +1420,29 @@ Installs IPython and any packages listed in requirements.txt if present."
   (setq web-mode-enable-css-colorization t))
 
 ;; SQL _______________________________________________________________
+;; Aucun mot de passe dans ce fichier : il est versionne et pousse sur GitHub.
+;; Les identifiants vivent dans ~/.pgpass, qui est le mecanisme standard de
+;; PostgreSQL lui-meme (lu par libpq, donc aussi par psql, pgAdmin, DBeaver,
+;; psycopg2, RPostgres...). Une ligne par connexion, permissions 600 obligatoires :
+;;
+;;     hote:port:base:utilisateur:motdepasse
+;;     localhost:5432:explore2:dora:...
+;;
+;; psql y trouve tout seul le mot de passe correspondant a la connexion demandee.
 (setq sql-connection-alist
       '((explore2 (sql-product 'postgres)
-                  (sql-database "postgresql://dora@localhost/explore2"))
-        (server2 (sql-product 'postgres)
-                 (sql-port 5432)
-                 (sql-server "localhost")
-                 (sql-user "user")
-                 (sql-password "password")
-                 (sql-database "db2"))))
+                  (sql-server   "localhost")
+                  (sql-port     5432)
+                  (sql-user     "dora")
+                  (sql-database "explore2"))))
+
+;; Modele pour ajouter une connexion (a copier dans la liste ci-dessus, sans
+;; jamais y mettre de sql-password) :
+;;   (nom-de-la-connexion (sql-product 'postgres)
+;;                        (sql-server   "localhost")
+;;                        (sql-port     5432)
+;;                        (sql-user     "utilisateur")
+;;                        (sql-database "base"))
 
 (defun my-sql-connect (product connection)
   "Connect to a SQL database with the given product and connection."
@@ -1379,3 +1489,77 @@ Installs IPython and any packages listed in requirements.txt if present."
   (markdown-mode . (lambda ()
                      (setq-local markdown-header-scaling t)
                      (markdown-update-header-faces t))))
+
+(defvar my/markdown-css-theme "notion"
+  "Theme actif pour la génération PDF depuis Markdown.
+Valeurs possibles : \"notion\" ou \"inrae\".")
+
+(defun my/markdown-toggle-theme ()
+  "Bascule entre le thème Notion et le thème INRAE pour les PDFs Markdown."
+  (interactive)
+  (setq my/markdown-css-theme
+        (if (string= my/markdown-css-theme "notion") "inrae" "notion"))
+  (message "Thème Markdown PDF : %s" my/markdown-css-theme))
+
+(defun my/markdown-to-pdf ()
+  "Convert current markdown file to PDF using pandoc + weasyprint."
+  (interactive)
+  (let* ((input    (buffer-file-name))
+         (base     (file-name-sans-extension input))
+         (html     (concat base ".html"))
+         (output   (concat base ".pdf"))
+         (inrae-p  (string= my/markdown-css-theme "inrae"))
+         (css      (if inrae-p
+                       (expand-file-name "~/.emacs.d/markdown-inrae.css")
+                     (expand-file-name "~/.emacs.d/markdown-notion.css")))
+         (template (if inrae-p
+                       (expand-file-name "~/.emacs.d/inrae-template.html")
+                     (expand-file-name "~/.emacs.d/notion-template.html")))
+	 (logo-inrae (expand-file-name "~/.emacs.d/cover/INRAE.svg"))
+	 (logo-ae    (expand-file-name "~/.emacs.d/cover/AE_light.svg"))
+         (pandoc-args (append
+		       (list input
+			     "-f" "gfm"
+			     ;; "-f" "markdown+raw_html"
+			     "-o" html
+                             "--standalone"
+                             "--css" css
+			     "--template" template
+			     "--toc"
+			     "--lua-filter" (expand-file-name "~/.emacs.d/back-to-toc.lua")
+                             "--metadata" "pagetitle= "
+                             "--metadata" "lang=fr")
+                       (when inrae-p
+                         (list "--metadata" (concat "inrae-logo=" logo-inrae)
+                               "--metadata" (concat "ae-logo=" logo-ae))))))
+    (if (not input)
+        (message "Buffer has no associated file.")
+      (save-buffer)
+      (message "Génération PDF avec thème %s..." my/markdown-css-theme)
+      (let ((proc (apply #'start-process "pandoc-md-pdf" "*pandoc-output*"
+                         "pandoc" pandoc-args)))
+        (process-put proc 'html-file html)
+        (process-put proc 'output-file output)
+        (set-process-sentinel
+         proc
+         (lambda (p _)
+           (let ((html-file   (process-get p 'html-file))
+                 (output-file (process-get p 'output-file)))
+             (if (= 0 (process-exit-status p))
+                 (let ((proc2 (start-process "weasyprint-pdf" "*pandoc-output*"
+                                             "weasyprint" html-file output-file)))
+                   (process-put proc2 'html-file html-file)
+                   (process-put proc2 'output-file output-file)
+                   (set-process-sentinel
+                    proc2
+                    (lambda (p2 _)
+                      (let ((hf (process-get p2 'html-file))
+                            (of (process-get p2 'output-file)))
+                        (delete-file hf)
+                        (if (= 0 (process-exit-status p2))
+                            (message "PDF generated: %s" of)
+                          (message "weasyprint failed — voir *pandoc-output*"))))))
+               (message "pandoc failed — voir *pandoc-output*")))))))))
+
+
+(global-set-key (kbd "C-c t") 'my/markdown-toggle-theme)
