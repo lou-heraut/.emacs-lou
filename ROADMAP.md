@@ -17,6 +17,7 @@
   choisir : `python-shell-dedicated` (par projet ou par buffer), ou rappeler
   `pyvenv-auto-activate` au démarrage du shell.
 
-## Ensemble
+## Terminal et Claude Code
 
-- Voir ce qui rapprocherait cette config d'un VS Code libre et simple.
+Passer progressivement au terminal (kitty), sans casser le graphique, avec
+Claude Code relié à Emacs : en cours, voir `dev/plans/2026-10-13_terminal.md`.
