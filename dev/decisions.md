@@ -18,9 +18,9 @@ avril 2027. Bilan et inventaire de l'interface :
 (26.3, Fabric, Sodium et Iris) dessine en OpenGL par Mesa (son journal du
 20 septembre 2026), et Mojang fait passer Minecraft Java à Vulkan, où les
 pilotes récents comptent. Ubuntu 24.04 fournit Mesa 25.2.8, le PPA suit les
-dernières versions stables (26.2.4). Les mises à jour passent par
-`apt full-upgrade`, pour que Mesa ne reste pas en deux versions mêlées. Repli
-possible sur la Mesa d'Ubuntu par `ppa-purge`.
+dernières versions stables (26.2.4). Si une mise à jour laisse des paquets
+de Mesa « retenus », regarder pourquoi avant de forcer. Repli possible sur la
+Mesa d'Ubuntu par `ppa-purge`.
 
 **Pas de snap** (13 octobre 2026, Lou). Pour aucun logiciel du poste. Une
 version plus récente passe par apt, une mise à niveau du système, un PPA ou
