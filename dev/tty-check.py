@@ -9,6 +9,10 @@ Le daemon est arrete a la fin ; le daemon habituel n'est pas touche.
 Ce test mesure le cote Emacs. Ce que le terminal envoie vraiment pour une
 touche se verifie a la main, dans ce terminal : `cat -v`, puis la touche.
 
+Le lancer sur la vraie config. Sur une copie placee ailleurs, Emacs
+recompile les paquets (eln-cache est indexe par chemin) et affiche des
+avertissements de compilation qui ne viennent pas de la config.
+
 Usage : python3 dev/tty-check.py [dossier-de-config]
         (par defaut, le depot qui contient ce script)
 """

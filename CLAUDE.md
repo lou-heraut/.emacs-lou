@@ -13,6 +13,7 @@ Utilisé en mode graphique **et** en terminal (`emacs -nw`).
 | `custom.el` | Poubelle de `M-x customize`. **Jamais chargé**, ignoré par git. |
 | `themes/` | Thème `apropospriate`, modifié localement. |
 | `fonts/` | Polices FIGlet `.flf` versionnées, utilisées par `C-c a`. |
+| `dev/` | Audits et plans datés, et `tty-check.py` : test des touches en terminal, à relancer après tout changement qui touche au terminal. |
 
 ## Conventions de travail attendues
 
