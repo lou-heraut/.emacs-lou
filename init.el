@@ -871,14 +871,48 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
 ;;     (python-nav-forward-statement)))
 
 
+;; python.el n'envoie au shell ses fonctions internes (`__PYTHON_EL_eval')
+;; qu'apres la premiere invite : un code envoye avant echoue (NameError) ou se
+;; perd, ce qui arrivait avec C-<return> juste apres avoir ferme *Python*.
+;; Le crochet public `python-shell-first-prompt-hook' signale ce moment.
+(defvar-local my-python-shell-ready nil
+  "Non nil dans le buffer d'un shell Python une fois sa premiere invite recue.")
+
+(defun my-python-mark-shell-ready ()
+  "Note, dans le buffer du shell, que python.el l'a prepare."
+  (setq my-python-shell-ready t))
+
+(add-hook 'python-shell-first-prompt-hook #'my-python-mark-shell-ready)
+
 (defun my-python-ensure-shell ()
   "Ensure Python shell is running and ready."
   (unless (python-shell-get-process)
     (my-python-start-shell))
-  ;; Wait until the process is alive
+  ;; Attendre la premiere invite, 10 s au plus pour ne jamais geler Emacs.
   (let ((proc (python-shell-get-process)))
-    (while (and proc (not (process-live-p proc)))
-      (accept-process-output proc 0.1))))
+    (with-timeout (10 (message "Le shell Python ne repond pas encore"))
+      (while (and proc (process-live-p proc)
+                  (not (buffer-local-value 'my-python-shell-ready
+                                           (process-buffer proc))))
+        (accept-process-output proc 0.1)))))
+
+;; Python ne definit `__file__' que lorsqu'il execute un fichier : pour du code
+;; envoye a un shell, il est absent. Comme Spyder, on le definit avant chaque
+;; envoi, avec le chemin du buffer, pour qu'un script qui utilise
+;; `Path(__file__)' marche ici comme avec `python script.py'.
+;; Toujours par `python-shell-send-string', qui n'attend pas : la variante
+;; `python-shell-send-string-no-output' attend que le shell soit libre, et
+;; bloque Emacs pendant un calcul long en cachant sa sortie (mesure).
+(defun my-python-file-assignment ()
+  "Code Python qui definit __file__ comme le fichier du buffer, ou \"\"."
+  (if buffer-file-name
+      (format "__file__ = %S\n" buffer-file-name)
+    ""))
+
+(defun my-python-set-file ()
+  "Definit __file__ dans le shell, sans attendre qu'il soit libre."
+  (when buffer-file-name
+    (python-shell-send-string (my-python-file-assignment))))
 
 (defun python-eval-logical-line-and-step ()
   "Evaluate current logical line in Python and step to next logical line."
@@ -886,7 +920,9 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
   (my-python-ensure-shell)
   (let ((beg (save-excursion (python-nav-beginning-of-statement) (point)))
         (end (save-excursion (python-nav-end-of-statement) (point))))
-    (python-shell-send-string (buffer-substring beg end))
+    ;; __file__ en tete du meme envoi : une seule invite dans le shell.
+    (python-shell-send-string (concat (my-python-file-assignment)
+                                      (buffer-substring beg end)))
     (goto-char end)
     (python-nav-forward-statement)))
 
@@ -916,7 +952,8 @@ Exempt major modes are defined in `display-line-numbers-exempt-modes'."
     (sql-send-buffer))              ;; For SQL scripts
    ((eq major-mode 'python-mode)
     (my-python-ensure-shell)
-    (python-shell-send-buffer))     ;; For Python
+    (my-python-set-file)
+    (python-shell-send-buffer t))   ;; For Python, bloc __main__ compris
    ((eq major-mode 'LaTeX-mode)
     (TeX-command-run-all arg))      ;; For LaTeX documents
    ((eq major-mode 'markdown-mode)
@@ -1281,19 +1318,19 @@ affichee dans le minibuffer."
 ;; PYTHON ____________________________________________________________
 ;; Choix de l'interpreteur, recalcule a chaque demarrage de shell Python.
 ;;
-;; Deux environnements coexistent et n'ont pas le meme nom de binaire :
-;;   - dans un venv cree par `create-python-env', c'est "ipython"
-;;   - installe globalement par apt sur Ubuntu 24.04, c'est "ipython3"
+;; IPython seulement s'il est installe dans le venv actif (c'est le cas des
+;; venvs crees par `create-python-env'), sinon le python3 du venv. Un IPython
+;; pris ailleurs, comme le "ipython3" d'apt, tourne sur le Python du systeme et
+;; melange ses paquets avec ceux du venv (erreurs NumPy 1.x contre 2.x).
 ;; On garde volontairement un nom RELATIF et non un chemin absolu, pour que la
-;; resolution passe par `exec-path' et suive donc le venv actif du moment.
-;; Sans ipython nulle part, on retombe sur python3 avec les bons arguments,
-;; au lieu d'echouer comme avant sur un "ipython" introuvable.
+;; resolution passe par `exec-path', ou pyvenv a mis le bin/ du venv en tete.
 (defun my/python-interpreter ()
   "Renvoie (NOM . ARGS) pour l'interpreteur Python a utiliser maintenant."
-  (let ((ipython (or (executable-find "ipython") (executable-find "ipython3"))))
-    (if ipython
-        (cons (file-name-nondirectory ipython) "--simple-prompt -i")
-      (cons "python3" "-i"))))
+  (if (and python-shell-virtualenv-root
+           (file-executable-p (expand-file-name "bin/ipython"
+                                                python-shell-virtualenv-root)))
+      (cons "ipython" "--simple-prompt -i")
+    (cons "python3" "-i")))
 
 (defun my/python-apply-interpreter (&optional local)
   "Regle `python-shell-interpreter' et ses arguments selon l'environnement.
@@ -1343,12 +1380,13 @@ Avec LOCAL non nil, le reglage est buffer-local (pour suivre un venv)."
 
 1. Prefer `.python_env` in current directory/project.
 2. Fallback to `~/.python_env` if none found."
-    (let* ((project-venv (locate-dominating-file default-directory ".python_env"))
+    (let* ((project-dir (locate-dominating-file default-directory ".python_env"))
+           (project-venv (and project-dir (expand-file-name ".python_env" project-dir)))
            (default-venv (expand-file-name "~/.python_env"))
            (venv-to-activate (or project-venv
                                  (and (file-directory-p default-venv) default-venv))))
       (when venv-to-activate
-        (pyvenv-activate (expand-file-name ".python_env" venv-to-activate))))))
+        (pyvenv-activate venv-to-activate)))))
 
 
 

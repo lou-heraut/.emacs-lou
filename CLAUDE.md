@@ -1,4 +1,4 @@
-# Configuration Emacs de Louis Héraut
+# Configuration Emacs de Lou Héraut
 
 Dépôt : `git@github.com:lou-heraut/.emacs-lou.git` (public, branche `main`).
 Emacs 29.3 sous Ubuntu 24.04, KDE Plasma 5.27 sur X11.
@@ -16,7 +16,7 @@ Utilisé en mode graphique **et** en terminal (`emacs -nw`).
 
 ## Conventions de travail attendues
 
-Ces règles viennent de Louis, elles priment sur les habitudes générales.
+Ces règles viennent de Lou, elles priment sur les habitudes générales.
 
 **Ne jamais être destructif.** Avant de supprimer quoi que ce soit, vérifier que
 c'est strictement redondant. En cas de doute, garder.
@@ -68,6 +68,13 @@ arrivé à `ascii-art-convert`, qui pointait vers `/home/louis/`. Utiliser
 processus externe qu'elle appelle. `ascii-art-convert` effaçait la ligne avant de
 constater l'échec de figlet.
 
+**Le code part vers le shell Python sans attendre.** Tout envoi passe par
+`python-shell-send-string`. `python-shell-send-string-no-output` attend que le
+shell soit libre : pendant un calcul long, Emacs se bloque, la sortie du calcul
+disparaît, et un `C-g` interrompt le processus Python (mesuré, et lu dans
+`python.el`). Seule attente légitime : la première invite d'un shell neuf, avant
+laquelle `__PYTHON_EL_eval` n'existe pas encore (`my-python-ensure-shell`).
+
 ## Mesures de référence
 
 Démarrage complet, mode daemon, médiane sur 3 :
@@ -95,14 +102,15 @@ rapport bénéfice sur risque jugé insuffisant. Pistes restantes si besoin :
 |---|---|---|
 | `figlet` | bannières `C-c a` | message clair, ligne intacte |
 | `pandoc` + `weasyprint` | export Markdown vers PDF (`my/markdown-to-pdf`) | échec signalé dans `*pandoc-output*` |
-| `ipython` ou `ipython3` | shell Python | repli automatique sur `python3` |
+| `ipython`, dans le venv actif | shell Python | repli sur le `python3` du venv |
 | `okular` | visionneuse PDF d'AUCTeX | |
 | `klipper` | presse-papier qui survit à la fermeture d'Emacs | contenu copié perdu |
 
-`ipython3` n'est pas installé au niveau système. Le nom du binaire diffère
-selon le contexte : `ipython` dans un venv créé par `create-python-env`,
-`ipython3` via apt. `my/python-interpreter` résout ça à l'exécution, en gardant
-un nom **relatif** pour que `exec-path` suive le venv actif.
+`my/python-interpreter` ne prend IPython que s'il est installé dans le venv
+actif (`create-python-env` l'y installe). Le `ipython3` d'apt, présent sur ce
+poste, est écarté exprès : il tourne sur le Python du système et mélange ses
+paquets avec ceux du venv (constaté : erreurs NumPy 1.x contre 2.x). Le nom
+reste **relatif** pour que `exec-path` suive le venv actif.
 
 ## Hors dépôt mais nécessaire au poste
 
