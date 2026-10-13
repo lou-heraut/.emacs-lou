@@ -24,6 +24,10 @@ raccourcis cohérents entre KDE, Firefox, kitty et Emacs, et un point d'entrée
 par projet pour les fichiers, l'éditeur, Claude Code et l'exécution. En cours,
 voir `dev/plans/2026-10-13_terminal.md`.
 
+- **Changer de distribution**, plus tard : KDE n'a plus de correctifs dans
+  Kubuntu 24.04 après avril 2027. Le bilan du poste et l'inventaire de
+  l'interface Plasma à remonter sont dans `dev/plans/2026-10-13_ubuntu-26.04.md`.
+
 ## Dépôt public
 
 - **Un `README.md`** : à quoi sert cette config, comment l'installer sur un

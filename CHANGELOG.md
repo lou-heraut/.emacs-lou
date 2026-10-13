@@ -18,8 +18,8 @@ Ce qui a été fait, version par version. Format
   vers PDF (modèles, CSS, logos).
 - `dev/tty-check.py` : vérifie qu'Emacs en terminal reçoit les touches de la
   config.
-- `dev/` : état des lieux et plan du passage au terminal, journal des choix
-  (`decisions.md`).
+- `dev/` : état des lieux et plan du passage au terminal, bilan du poste pour
+  Ubuntu 26.04 (mise à niveau reportée), journal des choix (`decisions.md`).
 
 ### Modifié
 
