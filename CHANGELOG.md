@@ -33,6 +33,8 @@ Ce qui a été fait, version par version. Format
   `~/.python_env` hors du dossier personnel.
 - `exec-path-from-shell` limité au mode graphique ; `select-enable-clipboard`
   remplace un alias obsolète ; `save-interprogram-paste-before-kill` activé.
+- Sauvegardes (`fichier~`), auto-sauvegardes (`#fichier#`) et verrous
+  (`.#fichier`) rangés dans `backups/` au lieu des dossiers de travail.
 
 ### Corrigé
 

@@ -24,6 +24,17 @@
 ;; et ne sera pas applique au redemarrage. Tout se regle a la main ici.
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
+;; Sauvegardes (fichier~), auto-sauvegardes (#fichier#) et verrous (.#fichier)
+;; vont tous dans backups/ au lieu de joncher les dossiers de travail. Leur nom
+;; y garde le chemin complet (!home!...!fichier~). Ce dossier garde des copies
+;; de tout ce qui a ete edite, secrets compris : Claude Code a une interdiction
+;; de lecture dessus, dans ~/.claude/settings.json.
+(let ((dir (expand-file-name "backups/" user-emacs-directory)))
+  (make-directory dir t)
+  (setq backup-directory-alist `(("." . ,dir))
+        auto-save-file-name-transforms `((".*" ,dir t))
+        lock-file-name-transforms `((".*" ,dir t))))
+
 ;; Liste explicite des paquets voulus (remplace l'ancien bloc custom-set-variables).
 ;; `use-package :ensure t' n'alimente PAS cette liste, il faut donc la tenir a jour
 ;; a la main quand on ajoute un paquet. Elle sert a deux choses :

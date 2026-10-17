@@ -1,4 +1,5 @@
-# Sauvegardes et fichiers temporaires d'Emacs
+# Sauvegardes et fichiers temporaires d'Emacs, rangés dans backups/ par init.el
+/backups/
 *~
 \#*\#
 .\#*
